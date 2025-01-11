@@ -51,7 +51,6 @@ export default async function WatchPage({
   console.log('Channel Thumbnails', data.channelThumbnails);
   return (
     <div>
-      <h1>Watch</h1>
       <WatchVideo
         playlistId={params.playlistId}
         playlistData={data.combinedData}

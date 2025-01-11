@@ -81,12 +81,12 @@ export function WatchVideo({
         </div>
       </header>
 
-      <div className="container ml-10 grid grid-cols-[1fr,400px] gap-6 py-6">
+      <div className="container ml-10 grid grid-cols-[1fr,400px] gap-10 py-6">
         <div className="space-y-4">
           <div className="aspect-video w-full overflow-hidden rounded-xl bg-black">
             <iframe
-              src={`https://www.youtube.com/embed/${videoId}`} // Correct embed URL format
-              title="YouTube video player" // Optional but recommended for accessibility
+              src={`https://www.youtube.com/embed/${videoId}`}
+              title="YouTube video player"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               className="h-full w-full"
@@ -138,7 +138,8 @@ export function WatchVideo({
           </div>
         </div>
 
-        <div className="space-y-4">
+        {/* side playlist component */}
+        <div className="space-y-4  overflow-y-auto border border-indigo-600 rounded-2xl p-3 max-h-[calc(100vh-150px)]">
           <div className="flex items-center gap-2">
             <Music2 className="h-5 w-5 text-[#8257E5]" />
             <h2 className="font-semibold text-white">Up Next</h2>
