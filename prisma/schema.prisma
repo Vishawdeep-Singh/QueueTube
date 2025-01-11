@@ -1,0 +1,218 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String?
+  image         String?
+  emailVerified DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  playlists     Playlist[]
+  authTokens    AuthToken[]
+  sessions      Session[]
+  accounts      Account[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model AuthToken {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id])
+  accessToken   Bytes    // Encrypted access token stored as bytes
+  refreshToken  Bytes?   // Optional encrypted refresh token
+  expiresAt     DateTime
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Playlist {
+  id              String           @id
+  kind            String
+  etag            String
+  userId          String
+  user            User             @relation(fields: [userId], references: [id])
+  snippet         PlaylistSnippet  @relation(fields: [snippetId], references: [id])
+  snippetId       String           @unique
+  contentDetails  PlaylistContentDetails @relation(fields: [contentDetailsId], references: [id])
+  contentDetailsId String           @unique
+  videos          Video[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([userId])
+}
+
+model PlaylistSnippet {
+  id            String    @id @default(uuid())
+  publishedAt   DateTime
+  channelId     String
+  title         String
+  description   String    @db.Text
+  thumbnails    Json      // Stores the Thumbnails object as JSON
+  channelTitle  String
+  playlist      Playlist?
+  localized     Localized @relation(fields: [localizedId], references: [id])
+  localizedId   String    @unique
+
+  @@index([channelId])
+}
+
+model Localized {
+  id          String           @id @default(uuid())
+  title       String
+  description String           @db.Text
+  snippet     PlaylistSnippet?
+  watchVideo  WatchVideoSnippet?
+}
+
+model PlaylistContentDetails {
+  id        String    @id @default(uuid())
+  itemCount Int
+  playlist  Playlist?
+}
+
+model Video {
+  id              String           @id
+  kind            String
+  etag            String
+  playlistId      String
+  playlist        Playlist         @relation(fields: [playlistId], references: [id])
+  videoDuration   String
+  viewCount       Int
+  snippet         VideoSnippet     @relation(fields: [snippetId], references: [id])
+  snippetId       String           @unique
+  contentDetails  VideoContentDetails @relation(fields: [contentDetailsId], references: [id])
+  contentDetailsId String           @unique
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([playlistId])
+}
+
+model VideoSnippet {
+  id                      String    @id @default(uuid())
+  publishedAt             DateTime
+  channelId              String
+  title                  String
+  description            String    @db.Text
+  thumbnails             Json      // Stores the Thumbnails object as JSON
+  channelTitle           String
+  playlistId             String
+  position               Int
+  resourceId             Json      // Stores the VideoResourceId object as JSON
+  videoOwnerChannelTitle String
+  videoOwnerChannelId    String
+  video                  Video?
+
+  @@index([channelId])
+}
+
+model VideoContentDetails {
+  id                String    @id @default(uuid())
+  videoId           String
+  videoPublishedAt  DateTime
+  video             Video?
+}
+
+model WatchVideo {
+  id              String               @id
+  kind            String
+  etag            String
+  snippet         WatchVideoSnippet    @relation(fields: [snippetId], references: [id])
+  snippetId       String               @unique
+  contentDetails  WatchVideoContentDetails @relation(fields: [contentDetailsId], references: [id])
+  contentDetailsId String               @unique
+  statistics      WatchVideoStatistics @relation(fields: [statisticsId], references: [id])
+  statisticsId    String               @unique
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+}
+
+model WatchVideoSnippet {
+  id                  String    @id @default(uuid())
+  publishedAt         DateTime
+  channelId          String
+  title              String
+  description        String    @db.Text
+  thumbnails         Json      // Stores the Thumbnails object as JSON
+  channelTitle       String
+  categoryId         String
+  liveBroadcastContent String
+  localized          Localized @relation(fields: [localizedId], references: [id])
+  localizedId        String    @unique
+  watchVideo         WatchVideo?
+
+  @@index([channelId])
+}
+
+model WatchVideoContentDetails {
+  id              String    @id @default(uuid())
+  duration        String
+  dimension       String
+  definition      String
+  caption         String
+  licensedContent Boolean
+  contentRating   Json      // Stores the Record<string, unknown> as JSON
+  projection      String
+  watchVideo      WatchVideo?
+}
+
+model WatchVideoStatistics {
+  id            String    @id @default(uuid())
+  viewCount     Int
+  likeCount     Int
+  favoriteCount String
+  commentCount  Int
+  watchVideo    WatchVideo?
+}
