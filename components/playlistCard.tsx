@@ -1,12 +1,8 @@
 'use client';
 import { Clock, Music2, Play, Video } from 'lucide-react';
-import {
-  PlaylistContentDetails,
-  Playlist,
-  PlaylistSnippet,
-} from '@/types/types';
+import { PlaylistContentDetails, PlaylistSnippet } from '@/types/types';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/hover-card';
+
 import { cn } from '@/lib/utils';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';

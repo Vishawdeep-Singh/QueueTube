@@ -2,10 +2,6 @@ import { Playlist } from '@/types/types';
 import { Music } from 'lucide-react';
 import { PlaylistCard } from './playlistCard';
 import { FC } from 'react';
-import { getServerSession } from 'next-auth';
-import authOptions from '@/lib/authOptions';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/hover-card';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Profile } from './profile';
 
 export const Playlists: FC<{ playlists: Playlist }> = async ({ playlists }) => {
@@ -18,6 +14,7 @@ export const Playlists: FC<{ playlists: Playlist }> = async ({ playlists }) => {
               <Music className="h-8 w-8 text-indigo-400" />
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-white">
+              {/* eslint-disable-next-line*/}
               Youtube's Playlists
             </h1>
           </div>

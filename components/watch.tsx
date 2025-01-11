@@ -12,6 +12,7 @@ import YouTube from 'react-youtube';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Button } from './ui/button';
+import type { Thumbnails, VideoItem, WatchVideo } from '@/types/types';
 
 export function WatchVideo({
   playlistId,
@@ -22,10 +23,10 @@ export function WatchVideo({
   playlistName,
 }: {
   playlistId: string;
-  playlistData: any[];
-  videoData: any;
+  playlistData: VideoItem[];
+  videoData: WatchVideo;
   videoId: string;
-  channelThumbnails: any;
+  channelThumbnails: Thumbnails;
   playlistName: string;
 }) {
   const router = useRouter();
@@ -74,7 +75,7 @@ export function WatchVideo({
       : `${minutes}:${String(seconds).padStart(2, '0')}`;
   };
 
-  const onPlayerStateChange = (event: any) => {
+  const onPlayerStateChange = (event: YT.OnStateChangeEvent) => {
     if (event.data === 0) {
       playNextVideo();
     }
@@ -200,7 +201,7 @@ export function WatchVideo({
             <h2 className="font-semibold text-white">Up Next</h2>
           </div>
           <div className="space-y-2">
-            {playlistData.map((video, index) => (
+            {playlistData.map((video) => (
               <button
                 key={video.id}
                 onClick={() => handleVideoClick(video.contentDetails.videoId)}
