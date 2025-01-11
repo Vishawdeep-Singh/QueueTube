@@ -81,11 +81,11 @@ export function WatchVideo({
         </div>
       </header>
 
-      <div className="container ml-10 grid grid-cols-[1fr,400px] gap-10 py-6">
+      <div className="container mx-auto grid grid-cols-[1fr,400px] gap-10 py-6">
         <div className="space-y-4">
           <div className="aspect-video w-full overflow-hidden rounded-xl bg-black">
             <iframe
-              src={`https://www.youtube.com/embed/${videoId}`}
+              src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
               title="YouTube video player"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen

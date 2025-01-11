@@ -53,41 +53,15 @@ export function PlaylistCard({
 
       <div className="p-6">
         <div className="mb-4 flex items-center gap-4">
-          <HoverCard>
-            <HoverCardTrigger asChild>
-              <button className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8257E5] transition-transform hover:scale-105">
-                <Avatar className="h-12 w-12 ring-2 ring-[#8257E5]/20">
-                  <AvatarImage
-                    src={session.data?.user?.image ?? undefined}
-                    alt={session.data?.user?.name ?? undefined}
-                  />
-                  <AvatarFallback className="bg-[#1F1F23]">
-                    {session.data?.user?.name?.charAt(0) ?? 'X'}
-                  </AvatarFallback>
-                </Avatar>
-              </button>
-            </HoverCardTrigger>
-            <HoverCardContent className="w-80 border-[#1F1F23] bg-[#121214] text-white">
-              <div className="flex justify-between space-x-4">
-                <Avatar className="h-12 w-12">
-                  <AvatarImage src={session.data?.user?.image ?? undefined} />
-                  <AvatarFallback className="bg-[#1F1F23]">
-                    {session.data?.user?.name?.charAt(0) ?? 'X'}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="space-y-1">
-                  <h4 className="text-sm font-semibold">
-                    {session.data?.user?.name ?? undefined}
-                  </h4>
-                  <p className="text-sm text-[#A1A1AA]">Playlist Creator</p>
-                  <div className="flex items-center gap-2 text-sm text-[#A1A1AA]">
-                    <Clock className="h-4 w-4" />
-                    <span>Joined {formatDate(Snippet.publishedAt)}</span>
-                  </div>
-                </div>
-              </div>
-            </HoverCardContent>
-          </HoverCard>
+          <Avatar className="h-12 w-12 ring-2 ring-[#8257E5]/20">
+            <AvatarImage
+              src={session.data?.user?.image ?? undefined}
+              alt={session.data?.user?.name ?? undefined}
+            />
+            <AvatarFallback className="bg-[#1F1F23]">
+              {session.data?.user?.name?.charAt(0) ?? 'X'}
+            </AvatarFallback>
+          </Avatar>
           <div>
             <h3 className="font-semibold text-white hover:text-[#8257E5] transition-colors">
               {session.data?.user?.name ?? undefined}
