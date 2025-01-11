@@ -8,11 +8,10 @@ import {
   Music2,
   ThumbsUp,
 } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Thumbnails, Video, VideoItem, type WatchVideo } from '@/types/types';
+import YouTube from 'react-youtube';
 import { useRouter } from 'next/navigation';
-
 import { useState } from 'react';
+import { Button } from './ui/button';
 
 export function WatchVideo({
   playlistId,
@@ -23,13 +22,32 @@ export function WatchVideo({
   playlistName,
 }: {
   playlistId: string;
-  playlistData: VideoItem[];
-  videoData: WatchVideo;
+  playlistData: any[];
+  videoData: any;
   videoId: string;
-  channelThumbnails: Thumbnails;
+  channelThumbnails: any;
   playlistName: string;
 }) {
-  console.log('AAAABBBB', videoData);
+  const router = useRouter();
+
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(
+    playlistData.findIndex((video) => video.contentDetails.videoId === videoId)
+  );
+
+  const playNextVideo = () => {
+    const currentIndex = playlistData.findIndex(
+      (video) => video.contentDetails.videoId === videoId
+    );
+    if (currentIndex < playlistData.length - 1) {
+      const nextVideo = playlistData[currentIndex + 1];
+      handleVideoClick(nextVideo.contentDetails.videoId);
+    }
+  };
+
+  const handleVideoClick = (newVideoId: string) => {
+    router.push(`/watch/${playlistId}/${newVideoId}`);
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -37,7 +55,7 @@ export function WatchVideo({
       day: 'numeric',
     });
   };
-  const router = useRouter();
+
   const formatViews = (views: number) => {
     return new Intl.NumberFormat('en-US', {
       notation: 'compact',
@@ -45,27 +63,51 @@ export function WatchVideo({
     }).format(views);
   };
 
-  function parseISODuration(duration: string): string {
+  const parseISODuration = (duration: string): string => {
     const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
     const hours = match?.[1] ? parseInt(match[1], 10) : 0;
     const minutes = match?.[2] ? parseInt(match[2], 10) : 0;
     const seconds = match?.[3] ? parseInt(match[3], 10) : 0;
 
-    // Format into HH:MM:SS or MM:SS if no hours
     return hours > 0
       ? `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
       : `${minutes}:${String(seconds).padStart(2, '0')}`;
-  }
-  const [loading, setLoading] = useState(false);
+  };
 
-  function handleVideoClick(videoId: string) {
-    setLoading(true); // Show loader
-    router.push(`/watch/${playlistId}/${videoId}`);
-  }
+  const onPlayerStateChange = (event: any) => {
+    if (event.data === 0) {
+      playNextVideo();
+    }
+  };
+
+  const playerOptions = {
+    height: '500',
+    width: '100%',
+    playerVars: {
+      autoplay: 1,
+      modestbranding: 1,
+    },
+  };
+
+  const handleNextVideo = () => {
+    if (currentVideoIndex < playlistData.length - 1) {
+      const nextVideo = playlistData[currentVideoIndex + 1];
+      router.push(`/watch/${playlistId}/${nextVideo.contentDetails.videoId}`);
+      setCurrentVideoIndex(currentVideoIndex + 1);
+    }
+  };
+
+  const handlePreviousVideo = () => {
+    if (currentVideoIndex > 0) {
+      const prevVideo = playlistData[currentVideoIndex - 1];
+      router.push(`/watch/${playlistId}/${prevVideo.contentDetails.videoId}`);
+      setCurrentVideoIndex(currentVideoIndex - 1);
+    }
+  };
 
   return (
     <div className="min-h-screen">
-      <header className="sticky  z-40 w-full border-b border-[#1F1F23] bg-[#0A0A0B]/95 backdrop-blur supports-[backdrop-filter]:bg-[#0A0A0B]/60">
+      <header className="sticky z-40 w-full border-b border-[#1F1F23] bg-[#0A0A0B]/95 backdrop-blur supports-[backdrop-filter]:bg-[#0A0A0B]/60">
         <div className="container flex px-5 h-16 items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
@@ -83,23 +125,37 @@ export function WatchVideo({
 
       <div className="container mx-auto grid grid-cols-[1fr,400px] gap-10 py-6">
         <div className="space-y-4">
-          <div className="aspect-video w-full overflow-hidden rounded-xl bg-black">
-            <iframe
-              src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
-              title="YouTube video player"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="h-full w-full"
+          <div className="w-full overflow-hidden rounded-xl bg-black">
+            <YouTube
+              videoId={videoId}
+              opts={playerOptions}
+              onStateChange={onPlayerStateChange}
             />
           </div>
           <div className="space-y-4">
             <h1 className="text-2xl font-bold text-white">
               {videoData.items[0].snippet.title}
             </h1>
+            <div className="flex justify-between">
+              <Button
+                onClick={handlePreviousVideo}
+                disabled={currentVideoIndex === 0}
+                className="px-4 font-bold text-lg hover:bg-gray-800 transition-colors duration-200 ease-in-out py-2 bg-gray-700 text-white rounded disabled:opacity-50"
+              >
+                Previous
+              </Button>
+              <Button
+                onClick={handleNextVideo}
+                disabled={currentVideoIndex === playlistData.length - 1}
+                className="px-4 py-2 bg-blue-600 text-lg text-white rounded font-bold hover:bg-indigo-800 transition-colors duration-200 ease-in-out disabled:opacity-50"
+              >
+                Next
+              </Button>
+            </div>
             <div className="flex items-center space-x-5">
               <img
                 src={channelThumbnails.high.url}
-                className="h-10 w-10 rounded-full "
+                className="h-10 w-10 rounded-full"
               />
               <div className="text-white font-bold text-xl">
                 {videoData.items[0].snippet.channelTitle}
@@ -138,8 +194,7 @@ export function WatchVideo({
           </div>
         </div>
 
-        {/* side playlist component */}
-        <div className="space-y-4  overflow-y-auto border border-indigo-600 rounded-2xl p-3 max-h-[calc(100vh-150px)]">
+        <div className="space-y-4 overflow-y-auto border border-indigo-600 rounded-2xl p-3 max-h-[calc(100vh-150px)]">
           <div className="flex items-center gap-2">
             <Music2 className="h-5 w-5 text-[#8257E5]" />
             <h2 className="font-semibold text-white">Up Next</h2>
